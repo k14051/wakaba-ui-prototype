@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>‚í‚©‚Î’n‹…‹V UIƒvƒƒgƒ^ƒCƒv</title>
+  <title>ã‚ã‹ã°åœ°çƒå„€ UIãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—</title>
   <style>
     body {
       margin: 0;
@@ -109,18 +109,18 @@
         <div class="star"></div>
         <div class="star"></div>
       </div>
-      <div class="menu">ß</div>
+      <div class="menu">â‰¡</div>
     </div>
 
-    <div class="screen">’n‹…‹Vƒrƒ…[</div>
+    <div class="screen">åœ°çƒå„€ãƒ“ãƒ¥ãƒ¼</div>
 
     <div class="bottom-bar">
       <div class="calendar-controls">
-        <button id="seireki">¼—ï</button>
-        <button id="wareki">˜a—ï</button>
-        <div id="era-display">]ŒË‘ãiŒc‰j</div>
+        <button id="seireki">è¥¿æš¦</button>
+        <button id="wareki">å’Œæš¦</button>
+        <div id="era-display">æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰</div>
       </div>
-      <div class="era-scroll">–¾ ‘å º •½ —ß</div>
+      <div class="era-scroll">æ˜ å¤§ æ˜­ å¹³ ä»¤</div>
       <div class="dial-row">
         <div class="dials">
           <input id="year" type="text" value="1868">
@@ -142,12 +142,12 @@
 
     document.getElementById('seireki').onclick = () => {
       seirekiMode = true;
-      document.getElementById('era-display').textContent = ']ŒË‘ãiŒc‰j';
+      document.getElementById('era-display').textContent = 'æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰';
     };
 
     document.getElementById('wareki').onclick = () => {
       seirekiMode = false;
-      document.getElementById('era-display').textContent = '–¾¡Œ³”N';
+      document.getElementById('era-display').textContent = 'æ˜æ²»å…ƒå¹´';
     };
 
     document.getElementById('prev').onclick = () => {
@@ -161,7 +161,7 @@
     };
 
     document.getElementById('go').onclick = () => {
-      alert(`${seirekiMode ? '¼—ï' : '˜a—ï'}: ${yearInput.value}”N‚ÖˆÚ“®`);
+      alert(`${seirekiMode ? 'è¥¿æš¦' : 'å’Œæš¦'}: ${yearInput.value}å¹´ã¸ç§»å‹•`);
     };
   </script>
 </body>
