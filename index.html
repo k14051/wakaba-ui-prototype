@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>わかばの地球儀 - 地形誇張バージョン</title>
+  <title>わかばの地球儀 - 誇張地形CDN版</title>
   <style>
     html, body { margin: 0; padding: 0; overflow: hidden; background: black; }
     canvas { display: block; }
@@ -23,28 +23,25 @@
 <div id="level-label">Level: -</div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 <script>
-// シーンとカメラ
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 光源
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// テクスチャローダー
+// CORSフリーなマップ画像
 const loader = new THREE.TextureLoader();
-const colorMapURL = "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg";
-const heightMapURL = "https://threejs.org/examples/textures/terrain/heightmap.png";
+const colorMapURL = "https://raw.githubusercontent.com/Chlorie1337/EarthTextures/main/color-simple.jpg";
+const heightMapURL = "https://raw.githubusercontent.com/Chlorie1337/EarthTextures/main/elevation-simple.png";
 
 Promise.all([
   loader.loadAsync(colorMapURL),
   loader.loadAsync(heightMapURL)
 ]).then(([colorMap, heightMap]) => {
-  // 材質とジオメトリ
   const geometry = new THREE.SphereGeometry(5, 128, 128);
   const material = new THREE.MeshStandardMaterial({
     map: colorMap,
@@ -56,17 +53,7 @@ Promise.all([
   const globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
 
-  // 建物ダミー（参考用）
-  const buildingGeo = new THREE.BoxGeometry(0.3, 0.3, 1);
-  const buildingMat = new THREE.MeshPhongMaterial({ color: 0xffaa00 });
-  const building = new THREE.Mesh(buildingGeo, buildingMat);
-  building.position.set(4, 2, 0);
-  scene.add(building);
-
-  // カメラ初期位置
   camera.position.z = 15;
-
-  // コントロール変数
   let isDragging = false;
   let previousMousePosition = { x: 0, y: 0 };
   let targetZoom = 15;
@@ -116,7 +103,6 @@ Promise.all([
   animate();
 });
 
-// リサイズ対応
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
