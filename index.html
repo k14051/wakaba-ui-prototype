@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>わかばの地球儀 - Lv1〜Lv5プロトタイプ</title>
+  <title>わかばの地球儀 - Z軸2倍ver</title>
   <style>
     html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; }
     canvas { display: block; }
@@ -24,26 +24,24 @@
   <div id="level-label">Level: -</div>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    // シーン設定
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // 光源
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(10, 10, 10);
     scene.add(light);
 
-    // 地球儀球体の作成（Z軸誇張）
+    // 地球儀球体（Z軸誇張＝2倍）
     const geometry = new THREE.SphereGeometry(5, 64, 64);
-    geometry.scale(1, 1, 100);  // Z軸誇張（100倍）
-    const material = new THREE.MeshPhongMaterial({color: 0x2255cc, wireframe: false});
+    geometry.scale(1, 1, 2);  // ← ここを100 → 2 に修正
+    const material = new THREE.MeshPhongMaterial({color: 0x2255cc});
     const globe = new THREE.Mesh(geometry, material);
     scene.add(globe);
 
-    // 建物（仮フィギュア）
+    // 建物フィギュア
     const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 1);
     const boxMat = new THREE.MeshPhongMaterial({color: 0xffaa00});
     const building1 = new THREE.Mesh(boxGeo, boxMat);
@@ -51,21 +49,15 @@
     const building2 = new THREE.Mesh(boxGeo, boxMat);
     building2.position.set(-3, -2, 1); scene.add(building2);
 
-    // カメラ設定
     camera.position.z = 15;
     let targetZoom = 15;
     let currentZoom = 15;
 
-    // マウス制御用
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
-    renderer.domElement.addEventListener('mousedown', function(e) {
-      isDragging = e.button === 0;
-    });
-    renderer.domElement.addEventListener('mouseup', function(e) {
-      isDragging = false;
-    });
-    renderer.domElement.addEventListener('mousemove', function(e) {
+    renderer.domElement.addEventListener('mousedown', e => { isDragging = e.button === 0; });
+    renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
+    renderer.domElement.addEventListener('mousemove', e => {
       if (isDragging) {
         const deltaX = e.offsetX - previousMousePosition.x;
         const deltaY = e.offsetY - previousMousePosition.y;
@@ -74,13 +66,12 @@
       }
       previousMousePosition = { x: e.offsetX, y: e.offsetY };
     });
-    renderer.domElement.addEventListener('wheel', function(e) {
+    renderer.domElement.addEventListener('wheel', e => {
       e.preventDefault();
       targetZoom += e.deltaY * 0.01;
       targetZoom = Math.min(Math.max(targetZoom, 7), 30);
     });
 
-    // レベル表示
     const levelLabel = document.getElementById('level-label');
     function getZoomLevel(z) {
       if (z > 25) return 1;
@@ -90,14 +81,12 @@
       return 5;
     }
 
-    // 明暗エフェクト
     function getBackgroundColor(z) {
       const brightness = Math.max(0, Math.min(1, (30 - z) / 20));
       const c = Math.floor(brightness * 255);
       return `rgb(${c},${c},${c})`;
     }
 
-    // 描画ループ
     function animate() {
       requestAnimationFrame(animate);
       currentZoom += (targetZoom - currentZoom) * 0.05;
@@ -108,9 +97,8 @@
     }
     animate();
 
-    // ウィンドウリサイズ対応
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
