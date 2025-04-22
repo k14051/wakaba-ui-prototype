@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>‚í‚©‚Î’n‹…‹V UI ‰º•”ƒpƒlƒ‹</title>
+  <title>ã‚ã‹ã°åœ°çƒå„€ UI ä¸‹éƒ¨ãƒ‘ãƒãƒ«</title>
   <style>
     body {
       background: #ffc86f;
@@ -107,9 +107,9 @@
 <body>
   <div class="panel">
     <div class="row">
-      <button class="mode-button seireki">¼—ï</button>
-      <button class="mode-button wareki">˜a—ï</button>
-      <div class="era-box">]ŒË‘ãiŒc‰j</div>
+      <button class="mode-button seireki">è¥¿æš¦</button>
+      <button class="mode-button wareki">å’Œæš¦</button>
+      <div class="era-box">æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰</div>
     </div>
     <div class="dial-row">
       <div style="display: flex; align-items: center; gap: 2px; margin-right: 8px;">
@@ -117,22 +117,22 @@
         <div class="digit-box" data-index="1">0</div>
         <div class="digit-box" data-index="2">0</div>
         <div class="digit-box" data-index="3">0</div>
-        <div class="dial-label">”N</div>
+        <div class="dial-label">å¹´</div>
         <div class="digit-box" data-index="4">0</div>
-        <div class="dial-label">Œ</div>
+        <div class="dial-label">æœˆ</div>
         <div class="digit-box" data-index="5">0</div>
-        <div class="dial-label">“ú</div>
+        <div class="dial-label">æ—¥</div>
       </div>
       <div class="jump-column">
-        <div class="jump-button">£</div>
-        <div class="jump-button">¥</div>
+        <div class="jump-button">â–²</div>
+        <div class="jump-button">â–¼</div>
       </div>
       <button class="go-button" onclick="showDate()">GO</button>
     </div>
   </div>
 
   <script>
-    // ƒhƒ‰ƒbƒO‚Å0?9‚Ì”š‚ğ‰ñ“]
+    // ãƒ‰ãƒ©ãƒƒã‚°ã§0ã€œ9ã®æ•°å­—ã‚’å›è»¢
     const boxes = document.querySelectorAll('.digit-box');
     boxes.forEach(box => {
       let startY = 0;
@@ -169,7 +169,7 @@
       const year = values.slice(0, 4).join('');
       const month = values[4];
       const day = values[5];
-      console.log(`‘I‘ğ‚³‚ê‚½“ú•tF${year}”N ${month}Œ ${day}“ú`);
+      console.log(`é¸æŠã•ã‚ŒãŸæ—¥ä»˜ï¼š${year}å¹´ ${month}æœˆ ${day}æ—¥`);
     }
   </script>
 </body>
