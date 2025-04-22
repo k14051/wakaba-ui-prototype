@@ -34,8 +34,8 @@ light.position.set(10, 10, 10);
 scene.add(light);
 
 const loader = new THREE.TextureLoader();
-const colorMapURL = "color_map_trimmed_extended.jpg";
-const heightMapURL = "elevation_map_with_antarctica.png";
+const colorMapURL = "colormap_final.jpg";
+const heightMapURL = "heightmap_final.png";
 
 Promise.all([
   loader.loadAsync(colorMapURL),
@@ -45,7 +45,7 @@ Promise.all([
   const material = new THREE.MeshStandardMaterial({
     map: colorMap,
     displacementMap: heightMap,
-    displacementScale: 0.1,
+    displacementScale: 0.07, // 標高の誇張具合を調整（お好みで 0.03〜0.1）
     flatShading: false
   });
 
