@@ -2,207 +2,118 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>わかば 和暦スクロール</title>
+  <title>わかばの地球儀 - Lv1〜Lv5プロトタイプ</title>
   <style>
-    body {
-      background: #ffc86f;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
-    }
-    .panel {
-      padding: 20px;
-      border-radius: 20px;
-      background: #ffc86f;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    }
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .mode-button {
-      padding: 4px 10px;
-      font-weight: bold;
-      border-radius: 8px;
-      border: 2px solid black;
-    }
-    .seireki { background: red; color: white; }
-    .wareki  { background: #888; color: white; }
-
-    /* 和暦表示：スクロール風エフェクト用コンテナ */
-    .era-box {
-      position: relative;
-      width: 160px;
-      height: 32px;
-      overflow: hidden;
-      border: 2px solid black;
-      background: #ffeb66;
-      border-radius: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
-    .era-text {
+    html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; }
+    canvas { display: block; }
+    #level-label {
       position: absolute;
-      width: 100%;
-      left: 0;
-      transition: transform 0.4s ease-in-out;
-    }
-
-    .main-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 6px;
-    }
-    .digit-box {
-      width: 30px;
-      height: 60px;
-      background: linear-gradient(to bottom, #d6ba76, #4d3b1f);
-      border-radius: 12px;
-      border: 2px solid black;
+      top: 10px;
+      left: 10px;
       color: white;
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 60px;
-      user-select: none;
-      cursor: ns-resize;
-    }
-    .dial-label {
-      font-size: 14px;
-      font-weight: bold;
-      margin: 0 4px;
-    }
-    .jump-button {
-      background: red;
-      color: white;
-      font-size: 24px;
-      font-weight: bold;
-      width: 36px;
-      height: 36px;
-      border: 2px solid black;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-left: 4px;
-    }
-    .jump-button.prev {
-      padding-left: 0;
-      padding-right: 4px;
-    }
-    .go-button {
-      background: #00aa44;
-      color: white;
-      font-weight: bold;
-      font-size: 18px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: 2px solid black;
-      margin-left: 6px;
+      font-size: 20px;
+      font-family: sans-serif;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="row">
-      <button class="mode-button seireki">西暦</button>
-      <button class="mode-button wareki">和暦</button>
-      <div class="era-box">
-        <div id="eraText1" class="era-text">江戸時代（慶応）</div>
-        <div id="eraText2" class="era-text" style="top: 32px;"></div>
-      </div>
-    </div>
-    <div class="main-row">
-      <div class="digit-box">1</div>
-      <div class="digit-box">8</div>
-      <div class="digit-box">6</div>
-      <div class="digit-box">5</div>
-      <div class="dial-label">年</div>
-      <div class="digit-box">ー</div>
-      <div class="dial-label">月</div>
-      <div class="digit-box">ー</div>
-      <div class="dial-label">日</div>
-      <div class="jump-button prev">&#9664;</div>
-      <div class="jump-button">&#9654;</div>
-      <button class="go-button" onclick="showDate()">GO</button>
-    </div>
-  </div>
-
+  <div id="level-label">Level: -</div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    const warekiTable = [
-      { start: 1868, label: "明治時代（明治）" },
-      { start: 1912, label: "大正時代（大正）" },
-      { start: 1926, label: "昭和時代（昭和）" },
-      { start: 1989, label: "平成時代（平成）" },
-      { start: 2019, label: "令和時代（令和）" },
-      { start: 1603, label: "江戸時代（慶応）" } // fallback
-    ];
+    // シーン設定
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    let currentLabel = "江戸時代（慶応）";
+    // 光源
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 10, 10);
+    scene.add(light);
 
-    function updateEraLabel(year) {
-      const era = warekiTable.find(e => year >= e.start) || warekiTable[warekiTable.length - 1];
-      const newLabel = era.label;
-      if (newLabel !== currentLabel) {
-        const text1 = document.getElementById("eraText1");
-        const text2 = document.getElementById("eraText2");
-        text2.textContent = newLabel;
-        text1.style.transform = "translateY(-32px)";
-        text2.style.transform = "translateY(-32px)";
-        setTimeout(() => {
-          text1.textContent = newLabel;
-          text1.style.transform = "translateY(0)";
-          text2.style.transform = "translateY(32px)";
-          currentLabel = newLabel;
-        }, 400);
-      }
-    }
+    // 地球儀球体の作成（Z軸誇張）
+    const geometry = new THREE.SphereGeometry(5, 64, 64);
+    geometry.scale(1, 1, 100);  // Z軸誇張（100倍）
+    const material = new THREE.MeshPhongMaterial({color: 0x2255cc, wireframe: false});
+    const globe = new THREE.Mesh(geometry, material);
+    scene.add(globe);
 
-    // ドラッグで数字を回転
-    const boxes = document.querySelectorAll('.digit-box');
-    boxes.forEach((box, index) => {
-      if (index > 3) return; // 年ダイヤルの4桁のみ
-      let startY = 0;
-      box.addEventListener('mousedown', e => {
-        startY = e.clientY;
-        document.onmousemove = drag;
-        document.onmouseup = stop;
-      });
-      let current = parseInt(box.textContent) || 0;
-      function drag(e) {
-        const delta = e.clientY - startY;
-        if (Math.abs(delta) > 20) {
-          if (delta > 0) current = (current + 1) % 10;
-          else current = (current + 9) % 10;
-          box.textContent = current;
-          startY = e.clientY;
-          const year = parseInt([...boxes].slice(0, 4).map(b => b.textContent).join(''));
-          updateEraLabel(year);
-        }
+    // 建物（仮フィギュア）
+    const boxGeo = new THREE.BoxGeometry(0.3, 0.3, 1);
+    const boxMat = new THREE.MeshPhongMaterial({color: 0xffaa00});
+    const building1 = new THREE.Mesh(boxGeo, boxMat);
+    building1.position.set(4, 2, 0); scene.add(building1);
+    const building2 = new THREE.Mesh(boxGeo, boxMat);
+    building2.position.set(-3, -2, 1); scene.add(building2);
+
+    // カメラ設定
+    camera.position.z = 15;
+    let targetZoom = 15;
+    let currentZoom = 15;
+
+    // マウス制御用
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    renderer.domElement.addEventListener('mousedown', function(e) {
+      isDragging = e.button === 0;
+    });
+    renderer.domElement.addEventListener('mouseup', function(e) {
+      isDragging = false;
+    });
+    renderer.domElement.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+        const deltaX = e.offsetX - previousMousePosition.x;
+        const deltaY = e.offsetY - previousMousePosition.y;
+        globe.rotation.y += deltaX * 0.005;
+        globe.rotation.x += deltaY * 0.005;
       }
-      function stop() {
-        document.onmousemove = null;
-        document.onmouseup = null;
-      }
+      previousMousePosition = { x: e.offsetX, y: e.offsetY };
+    });
+    renderer.domElement.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      targetZoom += e.deltaY * 0.01;
+      targetZoom = Math.min(Math.max(targetZoom, 7), 30);
     });
 
-    function showDate() {
-      const values = Array.from(boxes).map(b => b.textContent);
-      const year = values.slice(0, 4).join('');
-      const month = values[4];
-      const day = values[5];
-      console.log(`選択された日付：${year}年 ${month}月 ${day}日`);
+    // レベル表示
+    const levelLabel = document.getElementById('level-label');
+    function getZoomLevel(z) {
+      if (z > 25) return 1;
+      if (z > 20) return 2;
+      if (z > 15) return 3;
+      if (z > 10) return 4;
+      return 5;
     }
+
+    // 明暗エフェクト
+    function getBackgroundColor(z) {
+      const brightness = Math.max(0, Math.min(1, (30 - z) / 20));
+      const c = Math.floor(brightness * 255);
+      return `rgb(${c},${c},${c})`;
+    }
+
+    // 描画ループ
+    function animate() {
+      requestAnimationFrame(animate);
+      currentZoom += (targetZoom - currentZoom) * 0.05;
+      camera.position.z = currentZoom;
+      levelLabel.innerText = 'Level: ' + getZoomLevel(currentZoom);
+      renderer.setClearColor(getBackgroundColor(currentZoom));
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // ウィンドウリサイズ対応
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
