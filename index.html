@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>わかば地球儀 UI 下部パネル</title>
+  <title>わかば 年ダイヤルパネル</title>
   <style>
     body {
       background: #ffc86f;
@@ -15,15 +15,16 @@
     }
     .panel {
       background: #ffc86f;
-      width: 480px;
       padding: 20px;
       border-radius: 20px;
       box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .row {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       margin-bottom: 10px;
     }
@@ -48,11 +49,11 @@
       font-weight: bold;
       border-radius: 10px;
     }
-    .dial-row {
+    .main-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
+      gap: 4px;
+      margin-top: 6px;
     }
     .digit-box {
       width: 30px;
@@ -70,11 +71,29 @@
     }
     .dial-label {
       font-size: 14px;
-      margin: 0 4px;
       font-weight: bold;
+      margin: 0 4px;
+    }
+    .jump-button {
+      background: red;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      width: 36px;
+      height: 36px;
+      border: 2px solid black;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 4px; /* ▶をちょっと右にズラす */
+    }
+    .jump-button.prev {
+      padding-left: 0;
+      padding-right: 4px; /* ◀をちょっと左にズラす */
     }
     .go-button {
-      background: #deb887;
+      background: #00aa44;
       color: white;
       font-weight: bold;
       font-size: 18px;
@@ -82,28 +101,7 @@
       height: 50px;
       border-radius: 50%;
       border: 2px solid black;
-      margin-left: 12px;
-    }
-    .jump-button {
-      background: #cd853f;
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-      width: 32px;
-      height: 30px;
-      border: 2px solid black;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-    }
-    .jump-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-left: 10px;
-      margin-right: 10px;
+      margin-left: 6px;
     }
   </style>
 </head>
@@ -114,22 +112,18 @@
       <button class="mode-button wareki">和暦</button>
       <div class="era-box">江戸時代（慶応）</div>
     </div>
-    <div class="dial-row">
-      <div style="display: flex; align-items: center; gap: 2px; margin-right: 8px;">
-        <div class="digit-box" data-index="0">0</div>
-        <div class="digit-box" data-index="1">0</div>
-        <div class="digit-box" data-index="2">0</div>
-        <div class="digit-box" data-index="3">0</div>
-        <div class="dial-label">年</div>
-        <div class="digit-box" data-index="4">0</div>
-        <div class="dial-label">月</div>
-        <div class="digit-box" data-index="5">0</div>
-        <div class="dial-label">日</div>
-      </div>
-      <div class="jump-column">
-        <div class="jump-button">&#9650;</div> <!-- ▲ -->
-        <div class="jump-button">&#9660;</div> <!-- ▼ -->
-      </div>
+    <div class="main-row">
+      <div class="digit-box">0</div>
+      <div class="digit-box">0</div>
+      <div class="digit-box">0</div>
+      <div class="digit-box">0</div>
+      <div class="dial-label">年</div>
+      <div class="digit-box">0</div>
+      <div class="dial-label">月</div>
+      <div class="digit-box">0</div>
+      <div class="dial-label">日</div>
+      <div class="jump-button prev">&#9664;</div>
+      <div class="jump-button">&#9654;</div>
       <button class="go-button" onclick="showDate()">GO</button>
     </div>
   </div>
@@ -169,11 +163,3 @@
     function showDate() {
       const digits = document.querySelectorAll('.digit-box');
       const values = Array.from(digits).map(b => b.textContent);
-      const year = values.slice(0, 4).join('');
-      const month = values[4];
-      const day = values[5];
-      console.log(`選択された日付：${year}年 ${month}月 ${day}日`);
-    }
-  </script>
-</body>
-</html>
