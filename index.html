@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ã‚ã‹ã°åœ°çƒå„€ UIãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—</title>
+  <title>‚í‚©‚Î’n‹…‹V UIƒvƒƒgƒ^ƒCƒv</title>
   <style>
     body {
       margin: 0;
@@ -26,7 +26,6 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px;
-      background: #fff7e5;
     }
     .stars {
       display: flex;
@@ -64,37 +63,80 @@
     .bottom-bar {
       padding: 10px;
       background: #fff7e5;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
     .calendar-controls {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .calendar-controls .mode-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .calendar-controls .mode-buttons button {
+      padding: 4px 10px;
+    }
+    .era-display {
+      background: #ffeb99;
+      border: 2px solid #333;
+      padding: 4px 8px;
+      font-weight: bold;
     }
     .era-scroll {
       text-align: center;
-      margin-bottom: 5px;
+      font-family: monospace;
+      font-size: 16px;
+    }
+    .era-highlight {
+      background: yellow;
+      padding: 0 4px;
+      border-radius: 4px;
     }
     .dial-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 5px;
     }
-    .dials input {
-      width: 40px;
+    .dials {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .digit-box {
+      width: 30px;
+      height: 36px;
+      background: #000;
+      color: #ffd700;
       text-align: center;
-      font-size: 18px;
-      margin: 0 2px;
+      font-size: 20px;
+      line-height: 36px;
+      border-radius: 5px;
+    }
+    .label {
+      font-size: 12px;
+      text-align: center;
     }
     .buttons {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 5px;
     }
-    button {
+    .go-button {
+      background: green;
+      color: white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-weight: bold;
       font-size: 16px;
-      padding: 5px 10px;
-      margin: 0 5px;
+      border: none;
+    }
+    input[type=range] {
+      display: none;
     }
   </style>
 </head>
@@ -109,60 +151,97 @@
         <div class="star"></div>
         <div class="star"></div>
       </div>
-      <div class="menu">â‰¡</div>
+      <div class="menu">ß</div>
     </div>
 
-    <div class="screen">åœ°çƒå„€ãƒ“ãƒ¥ãƒ¼</div>
+    <div class="screen">’n‹…‹Vƒrƒ…[</div>
 
     <div class="bottom-bar">
       <div class="calendar-controls">
-        <button id="seireki">è¥¿æš¦</button>
-        <button id="wareki">å’Œæš¦</button>
-        <div id="era-display">æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰</div>
+        <div class="mode-buttons">
+          <button id="seireki" style="background:red; color:white;">¼—ï</button>
+          <button id="wareki">˜a—ï</button>
+        </div>
+        <div class="era-display" id="era-display">]ŒË‘ãiŒc‰j</div>
       </div>
-      <div class="era-scroll">æ˜ å¤§ æ˜­ å¹³ ä»¤</div>
+      <div class="era-scroll" id="era-scroll">
+        –¾@‘å@<span class="era-highlight">º</span>@•½@—ß
+      </div>
       <div class="dial-row">
         <div class="dials">
-          <input id="year" type="text" value="1868">
-          <input type="text" value="--" disabled>
-          <input type="text" value="--" disabled>
+          <input type="range" id="year-slider" min="1900" max="2025" value="1945">
+          <div class="digit-box" id="y1">1</div>
+          <div class="digit-box" id="y2">9</div>
+          <div class="digit-box" id="y3">4</div>
+          <div class="digit-box" id="y4">5</div>
+          <div class="digit-box" style="background:#ccc; color:#666;">--</div>
+          <div class="digit-box" style="background:#ccc; color:#666;">--</div>
         </div>
         <div class="buttons">
-          <button id="prev">?</button>
-          <button id="go">GO</button>
-          <button id="next">?</button>
+          <button id="jump-prev">?</button>
+          <button class="go-button" id="go">GO</button>
+          <button id="jump-next">?</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const yearInput = document.getElementById('year');
+    const eraDisplay = document.getElementById('era-display');
+    const eraScroll = document.getElementById('era-scroll');
+    const yearSlider = document.getElementById('year-slider');
+    const digits = [
+      document.getElementById('y1'),
+      document.getElementById('y2'),
+      document.getElementById('y3'),
+      document.getElementById('y4')
+    ];
+
+    function updateYearDigits(year) {
+      const yStr = year.toString().padStart(4, '0');
+      for (let i = 0; i < 4; i++) {
+        digits[i].textContent = yStr[i];
+      }
+    }
+
+    function highlightEra(year) {
+      let highlight = '';
+      if (year >= 1926 && year <= 1988) highlight = 'º';
+      else if (year >= 1989 && year <= 2018) highlight = '•½';
+      else if (year >= 2019) highlight = '—ß';
+      else if (year >= 1912) highlight = '‘å';
+      else highlight = '–¾';
+
+      eraScroll.innerHTML = '–¾@‘å@' +
+        (highlight === 'º' ? '<span class="era-highlight">º</span>' : 'º') +
+        '@' + (highlight === '•½' ? '<span class="era-highlight">•½</span>' : '•½') +
+        '@' + (highlight === '—ß' ? '<span class="era-highlight">—ß</span>' : '—ß');
+    }
+
     let seirekiMode = true;
 
     document.getElementById('seireki').onclick = () => {
       seirekiMode = true;
-      document.getElementById('era-display').textContent = 'æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰';
+      eraDisplay.textContent = 'º˜ai20”Nj';
     };
 
     document.getElementById('wareki').onclick = () => {
       seirekiMode = false;
-      document.getElementById('era-display').textContent = 'æ˜æ²»å…ƒå¹´';
-    };
-
-    document.getElementById('prev').onclick = () => {
-      const y = parseInt(yearInput.value);
-      if (!isNaN(y)) yearInput.value = y - 1;
-    };
-
-    document.getElementById('next').onclick = () => {
-      const y = parseInt(yearInput.value);
-      if (!isNaN(y)) yearInput.value = y + 1;
+      eraDisplay.textContent = 'º˜a20”N';
     };
 
     document.getElementById('go').onclick = () => {
-      alert(`${seirekiMode ? 'è¥¿æš¦' : 'å’Œæš¦'}: ${yearInput.value}å¹´ã¸ç§»å‹•`);
+      alert(`${seirekiMode ? '¼—ï' : '˜a—ï'}: ${yearSlider.value}”N‚ÖˆÚ“®`);
     };
+
+    yearSlider.addEventListener('input', () => {
+      const year = parseInt(yearSlider.value);
+      updateYearDigits(year);
+      highlightEra(year);
+    });
+
+    updateYearDigits(yearSlider.value);
+    highlightEra(yearSlider.value);
   </script>
 </body>
 </html>
