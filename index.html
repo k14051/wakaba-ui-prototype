@@ -163,3 +163,11 @@
     function showDate() {
       const digits = document.querySelectorAll('.digit-box');
       const values = Array.from(digits).map(b => b.textContent);
+      const year = values.slice(0, 4).join('');
+      const month = values[4];
+      const day = values[5];
+      console.log(`選択された日付：${year}年 ${month}月 ${day}日`);
+    }
+  </script>
+</body>
+</html>
