@@ -20,6 +20,7 @@
       justify-content: space-between;
       background: #fff7e5;
       overflow: hidden;
+      position: relative;
     }
     .top-bar {
       display: flex;
@@ -66,6 +67,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      position: relative;
     }
     .calendar-controls {
       display: flex;
@@ -86,25 +88,12 @@
       padding: 4px 8px;
       font-weight: bold;
     }
-    .era-scroll {
-      text-align: center;
-      font-family: monospace;
-      font-size: 16px;
-    }
-    .era-highlight {
-      background: yellow;
-      padding: 0 4px;
-      border-radius: 4px;
-    }
     .dial-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-    }
-    .dials {
-      display: flex;
+      justify-content: center;
       gap: 5px;
-      align-items: center;
+      position: relative;
     }
     .digit-box {
       width: 30px;
@@ -116,27 +105,40 @@
       line-height: 36px;
       border-radius: 5px;
     }
-    .label {
-      font-size: 12px;
-      text-align: center;
-    }
-    .buttons {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
     .go-button {
       background: green;
       color: white;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 18px;
       border: none;
+      position: absolute;
+      right: 20px;
+      bottom: 10px;
     }
-    input[type=range] {
-      display: none;
+    .jump-left {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      padding: 5px 10px;
+      background: #eee;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+    .jump-right {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      padding: 5px 10px;
+      background: #eee;
+      border: 1px solid #aaa;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -164,58 +166,35 @@
         </div>
         <div class="era-display" id="era-display">江戸時代（慶応）</div>
       </div>
-      <div class="era-scroll" id="era-scroll">
-        明　大　<span class="era-highlight">昭</span>　平　令
-      </div>
+
       <div class="dial-row">
-        <div class="dials">
-          <input type="range" id="year-slider" min="1900" max="2025" value="1945">
-          <div class="digit-box" id="y1">1</div>
-          <div class="digit-box" id="y2">9</div>
-          <div class="digit-box" id="y3">4</div>
-          <div class="digit-box" id="y4">5</div>
-          <div class="digit-box" style="background:#ccc; color:#666;">--</div>
-          <div class="digit-box" style="background:#ccc; color:#666;">--</div>
-        </div>
-        <div class="buttons">
-          <button id="jump-prev">?</button>
-          <button class="go-button" id="go">GO</button>
-          <button id="jump-next">?</button>
-        </div>
+        <button id="jump-prev" class="jump-left">?</button>
+        <div class="digit-box" id="y1">1</div>
+        <div class="digit-box" id="y2">9</div>
+        <div class="digit-box" id="y3">4</div>
+        <div class="digit-box" id="y4">5</div>
+        <button id="jump-next" class="jump-right">?</button>
       </div>
+
+      <button class="go-button" id="go">GO</button>
     </div>
   </div>
 
   <script>
     const eraDisplay = document.getElementById('era-display');
-    const eraScroll = document.getElementById('era-scroll');
-    const yearSlider = document.getElementById('year-slider');
     const digits = [
       document.getElementById('y1'),
       document.getElementById('y2'),
       document.getElementById('y3'),
       document.getElementById('y4')
     ];
+    const year = '1945';
 
     function updateYearDigits(year) {
       const yStr = year.toString().padStart(4, '0');
       for (let i = 0; i < 4; i++) {
         digits[i].textContent = yStr[i];
       }
-    }
-
-    function highlightEra(year) {
-      let highlight = '';
-      if (year >= 1926 && year <= 1988) highlight = '昭';
-      else if (year >= 1989 && year <= 2018) highlight = '平';
-      else if (year >= 2019) highlight = '令';
-      else if (year >= 1912) highlight = '大';
-      else highlight = '明';
-
-      eraScroll.innerHTML = '明　大　' +
-        (highlight === '昭' ? '<span class="era-highlight">昭</span>' : '昭') +
-        '　' + (highlight === '平' ? '<span class="era-highlight">平</span>' : '平') +
-        '　' + (highlight === '令' ? '<span class="era-highlight">令</span>' : '令');
     }
 
     let seirekiMode = true;
@@ -231,17 +210,10 @@
     };
 
     document.getElementById('go').onclick = () => {
-      alert(`${seirekiMode ? '西暦' : '和暦'}: ${yearSlider.value}年へ移動`);
+      alert(`${seirekiMode ? '西暦' : '和暦'}: ${year}年へ移動`);
     };
 
-    yearSlider.addEventListener('input', () => {
-      const year = parseInt(yearSlider.value);
-      updateYearDigits(year);
-      highlightEra(year);
-    });
-
-    updateYearDigits(yearSlider.value);
-    highlightEra(yearSlider.value);
+    updateYearDigits(year);
   </script>
 </body>
 </html>
