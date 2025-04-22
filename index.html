@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>わかば地球儀 UI 下部パネルのみ</title>
+  <title>わかば地球儀 UI 下部パネル</title>
   <style>
     body {
       background: #ffc86f;
@@ -15,7 +15,7 @@
     }
     .panel {
       background: #ffc86f;
-      width: 400px;
+      width: 460px;
       padding: 20px;
       border-radius: 20px;
       box-shadow: 0 0 8px rgba(0,0,0,0.2);
@@ -55,11 +55,18 @@
       margin-top: 10px;
     }
     .digit-box {
-      width: 24px;
+      width: 30px;
       height: 60px;
       background: linear-gradient(to bottom, #d6ba76, #4d3b1f);
       border-radius: 12px;
       border: 2px solid black;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 60px;
+      user-select: none;
+      cursor: ns-resize;
     }
     .dial-label {
       font-size: 14px;
@@ -95,12 +102,6 @@
       gap: 20px;
       margin-left: -8px;
     }
-    .jump-button:first-child {
-      margin-left: -16px;
-    }
-    .jump-button:last-child {
-      margin-left: 16px;
-    }
   </style>
 </head>
 <body>
@@ -112,22 +113,64 @@
     </div>
     <div class="dial-row">
       <div style="display: flex; align-items: center; gap: 2px; margin-right: 8px;">
-        <div class="digit-box"></div>
-        <div class="digit-box"></div>
-        <div class="digit-box"></div>
-        <div class="digit-box"></div>
+        <div class="digit-box" data-index="0">0</div>
+        <div class="digit-box" data-index="1">0</div>
+        <div class="digit-box" data-index="2">0</div>
+        <div class="digit-box" data-index="3">0</div>
         <div class="dial-label">年</div>
-        <div class="digit-box"></div>
+        <div class="digit-box" data-index="4">0</div>
         <div class="dial-label">月</div>
-        <div class="digit-box"></div>
+        <div class="digit-box" data-index="5">0</div>
         <div class="dial-label">日</div>
       </div>
       <div class="jump-column">
-        <div class="jump-button">?</div>
-        <div class="jump-button">?</div>
+        <div class="jump-button">▲</div>
+        <div class="jump-button">▼</div>
       </div>
-      <button class="go-button">GO</button>
+      <button class="go-button" onclick="showDate()">GO</button>
     </div>
   </div>
+
+  <script>
+    // ドラッグで0?9の数字を回転
+    const boxes = document.querySelectorAll('.digit-box');
+    boxes.forEach(box => {
+      let startY = 0;
+      let current = 0;
+
+      box.addEventListener('mousedown', e => {
+        startY = e.clientY;
+        document.onmousemove = drag;
+        document.onmouseup = stop;
+      });
+
+      function drag(e) {
+        const delta = e.clientY - startY;
+        if (Math.abs(delta) > 20) {
+          if (delta > 0) {
+            current = (current + 1) % 10;
+          } else {
+            current = (current + 9) % 10;
+          }
+          box.textContent = current;
+          startY = e.clientY;
+        }
+      }
+
+      function stop() {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      }
+    });
+
+    function showDate() {
+      const digits = document.querySelectorAll('.digit-box');
+      const values = Array.from(digits).map(b => b.textContent);
+      const year = values.slice(0, 4).join('');
+      const month = values[4];
+      const day = values[5];
+      console.log(`選択された日付：${year}年 ${month}月 ${day}日`);
+    }
+  </script>
 </body>
 </html>
