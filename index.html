@@ -34,8 +34,8 @@ light.position.set(10, 10, 10);
 scene.add(light);
 
 const loader = new THREE.TextureLoader();
-const colorMapURL = "color-simple.jpg";
-const heightMapURL = "elevation-simple.png";
+const colorMapURL = "color_map_trimmed_extended.jpg";
+const heightMapURL = "elevation_map_with_antarctica.png";
 
 Promise.all([
   loader.loadAsync(colorMapURL),
