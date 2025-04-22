@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ã‚ã‹ã°åœ°çƒå„€ UI ä¸‹éƒ¨ãƒ‘ãƒãƒ«ã®ã¿</title>
+  <title>‚í‚©‚Î’n‹…‹V UI ‰º•”ƒpƒlƒ‹‚Ì‚İ</title>
   <style>
     body {
       background: #ffc86f;
@@ -55,9 +55,9 @@
       margin-top: 10px;
     }
     .digit-box {
-      width: 36px;
+      width: 24px;
       height: 60px;
-      background: linear-gradient(to bottom, #e5b440, #000);
+      background: linear-gradient(to bottom, #d6ba76, #4d3b1f);
       border-radius: 12px;
       border: 2px solid black;
     }
@@ -67,7 +67,7 @@
       font-weight: bold;
     }
     .go-button {
-      background: #00bb55;
+      background: #deb887;
       color: white;
       font-weight: bold;
       font-size: 18px;
@@ -78,7 +78,7 @@
       margin-left: 12px;
     }
     .jump-button {
-      background: red;
+      background: #cd853f;
       color: white;
       font-size: 22px;
       font-weight: bold;
@@ -92,33 +92,39 @@
     .jump-column {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-left: 6px;
+      gap: 20px;
+      margin-left: -8px;
+    }
+    .jump-button:first-child {
+      margin-left: -16px;
+    }
+    .jump-button:last-child {
+      margin-left: 16px;
     }
   </style>
 </head>
 <body>
   <div class="panel">
     <div class="row">
-      <button class="mode-button seireki">è¥¿æš¦</button>
-      <button class="mode-button wareki">å’Œæš¦</button>
-      <div class="era-box">æ±Ÿæˆ¸æ™‚ä»£ï¼ˆæ…¶å¿œï¼‰</div>
+      <button class="mode-button seireki">¼—ï</button>
+      <button class="mode-button wareki">˜a—ï</button>
+      <div class="era-box">]ŒË‘ãiŒc‰j</div>
     </div>
     <div class="dial-row">
-      <div style="display: flex; align-items: center; gap: 4px;">
+      <div style="display: flex; align-items: center; gap: 2px; margin-right: 8px;">
         <div class="digit-box"></div>
         <div class="digit-box"></div>
         <div class="digit-box"></div>
         <div class="digit-box"></div>
-        <div class="dial-label">å¹´</div>
+        <div class="dial-label">”N</div>
         <div class="digit-box"></div>
-        <div class="dial-label">æœˆ</div>
+        <div class="dial-label">Œ</div>
         <div class="digit-box"></div>
-        <div class="dial-label">æ—¥</div>
+        <div class="dial-label">“ú</div>
       </div>
       <div class="jump-column">
-        <div class="jump-button">â—€</div>
-        <div class="jump-button">â–¶</div>
+        <div class="jump-button">?</div>
+        <div class="jump-button">?</div>
       </div>
       <button class="go-button">GO</button>
     </div>
