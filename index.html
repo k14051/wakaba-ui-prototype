@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>わかば 木枠UI＋下部ダイヤル完全版</title>
+  <title>わかば 木枠UI 修正版</title>
   <style>
     html, body {
       margin: 0;
@@ -16,7 +16,7 @@
     .frame {
       width: 360px;
       height: 640px;
-      border: 20px solid #8b5e3c;
+      border: 12px solid #8b5e3c; /* 細く修正 */
       border-radius: 24px;
       margin: auto;
       display: flex;
@@ -27,14 +27,12 @@
       background: #ffe7c6;
     }
 
-    /* 上部UI */
     .top-ui {
       height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
-      box-sizing: border-box;
     }
 
     .pin {
@@ -72,7 +70,6 @@
       border: 2px solid black;
     }
 
-    /* ガラス面 */
     .glass-area {
       flex: 1;
       background: #b0d0e8;
@@ -92,10 +89,9 @@
       opacity: 0.4;
     }
 
-    /* 下部UI */
     .bottom-ui {
       background: #ffc86f;
-      padding: 10px 12px;
+      padding: 8px;
       border-top: 2px solid #aaa;
     }
 
@@ -129,7 +125,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .digit-box {
@@ -144,13 +140,19 @@
       text-align: center;
       line-height: 60px;
       user-select: none;
-      cursor: ns-resize;
     }
 
     .dial-label {
       font-size: 14px;
       font-weight: bold;
       margin: 0 4px;
+    }
+
+    .jump-column {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-left: 6px;
     }
 
     .jump-button {
@@ -218,8 +220,13 @@
         <div class="dial-label">月</div>
         <div class="digit-box">ー</div>
         <div class="dial-label">日</div>
-        <div class="jump-button">&#9664;</div>
-        <div class="jump-button">&#9654;</div>
+
+        <!-- 年代ジャンプ：上下に並べて左右オフセット -->
+        <div class="jump-column">
+          <div class="jump-button">&#9650;</div>
+          <div class="jump-button">&#9660;</div>
+        </div>
+
         <button class="go-button">GO</button>
       </div>
     </div>
