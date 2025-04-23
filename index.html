@@ -1,24 +1,107 @@
-import math
-from PIL import Image, ImageDraw, ImageFont
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>わかば地球儀 with フィギュア</title>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #333; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-# フィギュアの仮画像を自動生成（再実行）
-def create_icon(label, size=64, color=(255, 255, 255), bg=(0, 100, 255)):
-    img = Image.new("RGB", (size, size), bg)
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.load_default()
-    w, h = draw.textsize(label, font=font)
-    draw.text(((size - w) / 2, (size - h) / 2), label, fill=color, font=font)
-    return img
+// ライト
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(10, 10, 10);
+scene.add(light);
 
-# 30個分の仮アイコン生成
-labels = [f"{i+1}" for i in range(30)]
-icons = [create_icon(label) for label in labels]
+// 地球
+const loader = new THREE.TextureLoader();
+const colorMap = loader.load("colormap_final.jpg");
+const heightMap = loader.load("heightmap_final.png");
 
-# 画像を保存してファイルパス返す
-paths = []
-for i, icon in enumerate(icons):
-    path = f"/mnt/data/figure_icon_{i+1}.png"
-    icon.save(path)
-    paths.append(path)
+const geometry = new THREE.SphereGeometry(5, 128, 128);
+const material = new THREE.MeshStandardMaterial({
+  map: colorMap,
+  displacementMap: heightMap,
+  displacementScale: 0.12,
+});
+const globe = new THREE.Mesh(geometry, material);
+scene.add(globe);
 
-paths
+// カメラ初期位置
+camera.position.z = 15;
+
+// ズーム処理
+let targetZoom = 15;
+let currentZoom = 15;
+renderer.domElement.addEventListener('wheel', e => {
+  e.preventDefault();
+  targetZoom += e.deltaY * 0.01;
+  targetZoom = Math.max(7, Math.min(30, targetZoom));
+});
+
+// 回転処理
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+renderer.domElement.addEventListener('mousedown', e => { isDragging = e.button === 0; });
+renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
+renderer.domElement.addEventListener('mousemove', e => {
+  if (isDragging) {
+    const dx = e.offsetX - previousMousePosition.x;
+    const dy = e.offsetY - previousMousePosition.y;
+    globe.rotation.y += dx * 0.005;
+    globe.rotation.x += dy * 0.005;
+  }
+  previousMousePosition = { x: e.offsetX, y: e.offsetY };
+});
+
+// フィギュア配置（仮のランダム位置：本番では緯度経度ベースに変換）
+const sprites = [];
+for (let i = 1; i <= 30; i++) {
+  const tex = loader.load(`figure_icon_${i}.png`);
+  const mat = new THREE.SpriteMaterial({ map: tex });
+  const sprite = new THREE.Sprite(mat);
+  
+  const lat = Math.random() * 180 - 90;  // 緯度 -90〜90
+  const lon = Math.random() * 360 - 180; // 経度 -180〜180
+  const radius = 5.01;
+
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+
+  sprite.position.set(
+    radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta)
+  );
+  sprite.scale.set(0.4, 0.4, 0.4);
+  scene.add(sprite);
+  sprites.push(sprite);
+}
+
+// アニメーション
+function animate() {
+  requestAnimationFrame(animate);
+  currentZoom += (targetZoom - currentZoom) * 0.05;
+  camera.position.z = currentZoom;
+  renderer.render(scene, camera);
+}
+animate();
+
+// リサイズ
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
