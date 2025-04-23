@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>わかば木枠UI</title>
+  <title>わかば 木枠UI＋下部ダイヤル完全版</title>
   <style>
     html, body {
       margin: 0;
@@ -72,7 +72,7 @@
       border: 2px solid black;
     }
 
-    /* ガラス面（地球儀表示領域） */
+    /* ガラス面 */
     .glass-area {
       flex: 1;
       background: #b0d0e8;
@@ -92,44 +92,37 @@
       opacity: 0.4;
     }
 
-    /* 下部UI（既存年ダイヤル） */
+    /* 下部UI */
     .bottom-ui {
       background: #ffc86f;
-      padding: 8px;
+      padding: 10px 12px;
       border-top: 2px solid #aaa;
     }
 
     .row {
       display: flex;
       align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
       justify-content: center;
-      gap: 6px;
-      margin-bottom: 6px;
     }
 
     .mode-button {
-      padding: 4px 8px;
+      padding: 4px 10px;
       font-weight: bold;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 2px solid black;
     }
 
-    .seireki {
-      background: red;
-      color: white;
-    }
-
-    .wareki {
-      background: #888;
-      color: white;
-    }
+    .seireki { background: red; color: white; }
+    .wareki { background: #888; color: white; }
 
     .era-box {
       background: #ffeb66;
       border: 2px solid black;
-      padding: 4px 12px;
+      padding: 6px 16px;
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 10px;
     }
 
     .dial-row {
@@ -141,21 +134,37 @@
 
     .digit-box {
       width: 24px;
-      height: 40px;
-      background: #4d3b1f;
-      color: white;
-      font-weight: bold;
-      font-size: 20px;
-      text-align: center;
-      line-height: 40px;
-      border-radius: 6px;
+      height: 60px;
+      background: linear-gradient(to bottom, #d6ba76, #4d3b1f);
+      border-radius: 12px;
       border: 2px solid black;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 60px;
+      user-select: none;
+      cursor: ns-resize;
     }
 
     .dial-label {
       font-size: 14px;
       font-weight: bold;
       margin: 0 4px;
+    }
+
+    .jump-button {
+      background: red;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      width: 32px;
+      height: 32px;
+      border: 2px solid black;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .go-button {
@@ -167,7 +176,7 @@
       height: 44px;
       border-radius: 50%;
       border: 2px solid black;
-      margin-left: 8px;
+      margin-left: 6px;
     }
   </style>
 </head>
@@ -209,6 +218,8 @@
         <div class="dial-label">月</div>
         <div class="digit-box">ー</div>
         <div class="dial-label">日</div>
+        <div class="jump-button">&#9664;</div>
+        <div class="jump-button">&#9654;</div>
         <button class="go-button">GO</button>
       </div>
     </div>
