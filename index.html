@@ -1,112 +1,218 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>わかばの地球儀</title>
+  <meta charset="UTF-8" />
+  <title>わかば木枠UI</title>
   <style>
-    html, body { margin: 0; padding: 0; overflow: hidden; background: black; }
-    canvas { display: block; }
-    #level-label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #d6b78e;
+      font-family: "Meiryo", sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .frame {
+      width: 360px;
+      height: 640px;
+      border: 20px solid #8b5e3c;
+      border-radius: 24px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      position: relative;
+      background: #ffe7c6;
+    }
+
+    /* 上部UI */
+    .top-ui {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+
+    .pin {
+      width: 24px;
+      height: 24px;
+      background: red;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .stars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .star {
+      width: 20px;
+      height: 20px;
+      background: gold;
+      border-radius: 50%;
+      opacity: 0.2;
+    }
+
+    .star.on {
+      opacity: 1;
+    }
+
+    .menu-button {
+      background: #555;
       color: white;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid black;
+    }
+
+    /* ガラス面（地球儀表示領域） */
+    .glass-area {
+      flex: 1;
+      background: #b0d0e8;
+      margin: 4px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: #444;
+      opacity: 0.4;
+    }
+
+    /* 下部UI（既存年ダイヤル） */
+    .bottom-ui {
+      background: #ffc86f;
+      padding: 8px;
+      border-top: 2px solid #aaa;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .mode-button {
+      padding: 4px 8px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 2px solid black;
+    }
+
+    .seireki {
+      background: red;
+      color: white;
+    }
+
+    .wareki {
+      background: #888;
+      color: white;
+    }
+
+    .era-box {
+      background: #ffeb66;
+      border: 2px solid black;
+      padding: 4px 12px;
+      font-weight: bold;
+      border-radius: 8px;
+    }
+
+    .dial-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .digit-box {
+      width: 24px;
+      height: 40px;
+      background: #4d3b1f;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      text-align: center;
+      line-height: 40px;
+      border-radius: 6px;
+      border: 2px solid black;
+    }
+
+    .dial-label {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0 4px;
+    }
+
+    .go-button {
+      background: #00aa44;
+      color: white;
+      font-weight: bold;
       font-size: 16px;
-      background: rgba(0,0,0,0.5);
-      padding: 4px 10px;
-      border-radius: 5px;
-      z-index: 10;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid black;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
-<div id="level-label">Level: -</div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script>
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+  <div class="frame">
 
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(10, 10, 10);
-scene.add(light);
+    <!-- 上部UI -->
+    <div class="top-ui">
+      <div class="pin"></div>
+      <div class="stars">
+        <div class="star on"></div>
+        <div class="star on"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+      </div>
+      <button class="menu-button">≡</button>
+    </div>
 
-const loader = new THREE.TextureLoader();
-const colorMapURL = "colormap_final.jpg";
-const heightMapURL = "heightmap_final.png";
+    <!-- ガラス面 -->
+    <div class="glass-area">
+      <div class="glass-label">地球儀ビュー（仮）</div>
+    </div>
 
-Promise.all([
-  loader.loadAsync(colorMapURL),
-  loader.loadAsync(heightMapURL)
-]).then(([colorMap, heightMap]) => {
-  const geometry = new THREE.SphereGeometry(5, 128, 128);
-  const material = new THREE.MeshStandardMaterial({
-    map: colorMap,
-    displacementMap: heightMap,
-    displacementScale: 0.4, // 標高の誇張具合を調整（お好みで 0.03〜0.1）
-    flatShading: false
-  });
+    <!-- 下部UI -->
+    <div class="bottom-ui">
+      <div class="row">
+        <button class="mode-button seireki">西暦</button>
+        <button class="mode-button wareki">和暦</button>
+        <div class="era-box">江戸時代（慶応）</div>
+      </div>
+      <div class="dial-row">
+        <div class="digit-box">1</div>
+        <div class="digit-box">8</div>
+        <div class="digit-box">6</div>
+        <div class="digit-box">5</div>
+        <div class="dial-label">年</div>
+        <div class="digit-box">ー</div>
+        <div class="dial-label">月</div>
+        <div class="digit-box">ー</div>
+        <div class="dial-label">日</div>
+        <button class="go-button">GO</button>
+      </div>
+    </div>
 
-  const globe = new THREE.Mesh(geometry, material);
-  scene.add(globe);
-
-  camera.position.z = 15;
-  let isDragging = false;
-  let previousMousePosition = { x: 0, y: 0 };
-  let targetZoom = 15;
-  let currentZoom = 15;
-
-  renderer.domElement.addEventListener('mousedown', e => { isDragging = e.button === 0; });
-  renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
-  renderer.domElement.addEventListener('mousemove', e => {
-    if (isDragging) {
-      const dx = e.offsetX - previousMousePosition.x;
-      const dy = e.offsetY - previousMousePosition.y;
-      globe.rotation.y += dx * 0.005;
-      globe.rotation.x += dy * 0.005;
-    }
-    previousMousePosition = { x: e.offsetX, y: e.offsetY };
-  });
-  renderer.domElement.addEventListener('wheel', e => {
-    e.preventDefault();
-    targetZoom += e.deltaY * 0.01;
-    targetZoom = Math.max(7, Math.min(30, targetZoom));
-  });
-
-  const levelLabel = document.getElementById("level-label");
-  function getZoomLevel(z) {
-    if (z > 25) return 1;
-    if (z > 20) return 2;
-    if (z > 15) return 3;
-    if (z > 10) return 4;
-    return 5;
-  }
-
-  function getBackgroundColor(z) {
-    const brightness = Math.max(0, Math.min(1, (30 - z) / 20));
-    const c = Math.floor(brightness * 255);
-    return `rgb(${c},${c},${c})`;
-  }
-
-  function animate() {
-    requestAnimationFrame(animate);
-    currentZoom += (targetZoom - currentZoom) * 0.05;
-    camera.position.z = currentZoom;
-    levelLabel.innerText = "Level: " + getZoomLevel(currentZoom);
-    renderer.setClearColor(getBackgroundColor(currentZoom));
-    renderer.render(scene, camera);
-  }
-
-  animate();
-});
-
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-</script>
+  </div>
 </body>
 </html>
