@@ -244,50 +244,53 @@
     </div>
   </div>
 
-  <script>
-    const boxes = document.querySelectorAll('.digit-box');
-    boxes.forEach((box, index) => {
-      if (index > 3) return; // 年の4桁だけ
-      let inner = box.querySelector('.digit-inner');
-      let current = parseInt(inner.textContent) || 0;
-      let startY = 0;
+<script>
+  const boxes = document.querySelectorAll('.digit-box');
+  boxes.forEach((box, index) => {
+    if (index > 3) return; // 年の4桁だけ操作対象
+    let inner = box.querySelector('.digit-inner');
+    let current = parseInt(inner.textContent) || 0;
+    let startY = 0;
+    let dragging = false;
 
-      box.addEventListener('mousedown', e => {
-        startY = e.clientY;
-        document.onmousemove = drag;
-        document.onmouseup = stop;
-      });
-
-      function drag(e) {
-        const delta = e.clientY - startY;
-        if (Math.abs(delta) > 20) {
-          current = (delta > 0) ? (current + 1) % 10 : (current + 9) % 10;
-          const next = document.createElement('div');
-          next.className = 'digit-inner';
-          next.textContent = current;
-          next.style.top = delta > 0 ? '-60px' : '60px';
-          box.appendChild(next);
-          requestAnimationFrame(() => {
-            next.style.transition = 'transform 0.2s ease';
-            next.style.transform = 'translateY(' + (delta > 0 ? '60px' : '-60px') + ')';
-            inner.style.transform = 'translateY(' + (delta > 0 ? '60px' : '-60px') + ')';
-          });
-          setTimeout(() => {
-            inner.remove();
-            next.style.transform = '';
-            next.style.top = '0';
-          }, 200);
-          inner = next;
-          startY = e.clientY;
-        }
-      }
-
-      function stop() {
-        document.onmousemove = null;
-        document.onmouseup = null;
-      }
+    box.addEventListener('mousedown', e => {
+      e.preventDefault();
+      startY = e.clientY;
+      dragging = true;
+      document.onmousemove = drag;
+      document.onmouseup = stop;
     });
-  </script>
+
+    function drag(e) {
+      if (!dragging) return;
+      const delta = e.clientY - startY;
+      if (Math.abs(delta) > 20) {
+        // 前のinnerをすべて削除
+        box.querySelectorAll('.digit-inner').forEach(el => el.remove());
+
+        // 値更新
+        current = (delta > 0) ? (current + 1) % 10 : (current + 9) % 10;
+
+        // 新しいinnerを作成
+        const newInner = document.createElement('div');
+        newInner.className = 'digit-inner';
+        newInner.textContent = current;
+        newInner.style.top = '0';
+        box.appendChild(newInner);
+
+        // 更新
+        inner = newInner;
+        startY = e.clientY;
+      }
+    }
+
+    function stop() {
+      dragging = false;
+      document.onmousemove = null;
+      document.onmouseup = null;
+    }
+  });
+</script>
 </body>
 </html>
 
