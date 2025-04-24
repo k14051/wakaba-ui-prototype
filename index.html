@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>わかば地球儀 with フィギュア</title>
+  <title>わかば地球儀 - フィギュア版</title>
   <style>
-    html, body { margin: 0; padding: 0; overflow: hidden; background: #333; }
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #222; }
     canvas { display: block; }
   </style>
 </head>
@@ -22,69 +22,99 @@ const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// 地球
+// 地球マップ読み込み
 const loader = new THREE.TextureLoader();
 const colorMap = loader.load("colormap_final.jpg");
 const heightMap = loader.load("heightmap_final.png");
 
+// 地球本体
 const geometry = new THREE.SphereGeometry(5, 128, 128);
 const material = new THREE.MeshStandardMaterial({
   map: colorMap,
   displacementMap: heightMap,
-  displacementScale: 0.12,
+  displacementScale: 0.12
 });
 const globe = new THREE.Mesh(geometry, material);
 scene.add(globe);
 
 // カメラ初期位置
 camera.position.z = 15;
-
-// ズーム処理
 let targetZoom = 15;
 let currentZoom = 15;
-renderer.domElement.addEventListener('wheel', e => {
+
+// カメラ操作
+renderer.domElement.addEventListener("wheel", e => {
   e.preventDefault();
   targetZoom += e.deltaY * 0.01;
   targetZoom = Math.max(7, Math.min(30, targetZoom));
 });
-
-// 回転処理
 let isDragging = false;
-let previousMousePosition = { x: 0, y: 0 };
-renderer.domElement.addEventListener('mousedown', e => { isDragging = e.button === 0; });
-renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
-renderer.domElement.addEventListener('mousemove', e => {
+let prevMouse = { x: 0, y: 0 };
+renderer.domElement.addEventListener("mousedown", e => { isDragging = e.button === 0; });
+renderer.domElement.addEventListener("mouseup", () => { isDragging = false; });
+renderer.domElement.addEventListener("mousemove", e => {
   if (isDragging) {
-    const dx = e.offsetX - previousMousePosition.x;
-    const dy = e.offsetY - previousMousePosition.y;
+    const dx = e.offsetX - prevMouse.x;
+    const dy = e.offsetY - prevMouse.y;
     globe.rotation.y += dx * 0.005;
     globe.rotation.x += dy * 0.005;
   }
-  previousMousePosition = { x: e.offsetX, y: e.offsetY };
+  prevMouse = { x: e.offsetX, y: e.offsetY };
 });
 
-// フィギュア配置（仮のランダム位置：本番では緯度経度ベースに変換）
-const sprites = [];
-for (let i = 1; i <= 30; i++) {
-  const tex = loader.load(`figure_icons_all/figure_icon_${i}.png`);
-  const mat = new THREE.SpriteMaterial({ map: tex });
-  const sprite = new THREE.Sprite(mat);
-  
-  const lat = Math.random() * 180 - 90;  // 緯度 -90〜90
-  const lon = Math.random() * 360 - 180; // 経度 -180〜180
-  const radius = 5.01;
-
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-
-  sprite.position.set(
+// 緯度経度 → 3D座標
+function latLonToVector3(lat, lon, radius = 5.01) {
+  const phi = (90 - lat) * Math.PI / 180;
+  const theta = (lon + 180) * Math.PI / 180;
+  return new THREE.Vector3(
     radius * Math.sin(phi) * Math.cos(theta),
     radius * Math.cos(phi),
     radius * Math.sin(phi) * Math.sin(theta)
   );
+}
+
+// フィギュア30体の緯度経度
+const locations = [
+  [29.98, 31.13],   // ピラミッド
+  [34.84, 134.69],  // 姫路城
+  [35.02, 135.75],  // 紫式部（京都）
+  [40.68, 117.23],  // 万里の長城
+  [48.85, 2.35],    // ナポレオン（パリ）
+  [23.13, -82.38],  // コロンブス艦隊
+  [51.18, -1.83],   // ストーンヘンジ
+  [27.17, 78.04],   // タージ・マハル
+  [41.89, 12.49],   // ローマ
+  [30.33, 35.44],   // ペトラ遺跡
+  [37.77, -122.42], // ゴールデンゲート
+  [43.07, 141.35],  // 札幌
+  [19.43, -99.13],  // メキシコシティ
+  [31.23, 121.47],  // 上海
+  [37.98, 23.72],   // パルテノン神殿
+  [55.75, 37.61],   // モスクワ
+  [52.52, 13.40],   // ベルリン
+  [35.68, 139.69],  // 東京
+  [39.90, 116.40],  // 北京
+  [25.03, 121.56],  // 台北
+  [33.44, -112.07], // フェニックス
+  [-22.90, -43.20], // リオ
+  [51.50, -0.12],   // ロンドン
+  [55.95, -3.18],   // エディンバラ
+  [-33.87, 151.21], // シドニー
+  [-34.61, -58.38], // ブエノスアイレス
+  [60.17, 24.94],   // ヘルシンキ
+  [50.08, 14.43],   // プラハ
+  [41.39, 2.17],    // バルセロナ
+  [30.59, 114.30]   // 武漢
+];
+
+// 各アイコンをSpriteで追加
+for (let i = 0; i < locations.length; i++) {
+  const tex = loader.load(`figure_icons_all/figure_icon_${i+1}.png`);
+  const mat = new THREE.SpriteMaterial({ map: tex });
+  const sprite = new THREE.Sprite(mat);
   sprite.scale.set(0.4, 0.4, 0.4);
-  scene.add(sprite);
-  sprites.push(sprite);
+  sprite.position.copy(latLonToVector3(locations[i][0], locations[i][1]));
+  globe.add(sprite);
 }
 
 // アニメーション
