@@ -89,10 +89,12 @@
     }
 
     .bottom-ui {
-      background: #ffc86f;
-      padding: 8px;
-      border-top: 2px solid #aaa;
-    }
+  background: #ffc86f;
+  padding: 8px;
+  border-top: 2px solid #aaa;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
 
     .row {
       display: flex;
@@ -147,6 +149,9 @@
       overflow: hidden;
       position: relative;
       user-select: none;
+.dial-row .digit-box:nth-child(6),
+.dial-row .digit-box:nth-child(8) {
+  width: 36px; /* 2桁まで収まるように広く */
     }
 
     .digit-inner {
