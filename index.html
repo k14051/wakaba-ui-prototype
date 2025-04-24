@@ -1,145 +1,293 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>わかば地球儀 フィギュア版</title>
+  <meta charset="UTF-8">
+  <title>わかば木枠UI 完全修正版</title>
   <style>
-    html, body { margin: 0; padding: 0; overflow: hidden; background: #222; }
-    canvas { display: block; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #d6b78e;
+      font-family: "Meiryo", sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .frame {
+      width: 360px;
+      height: 640px;
+      border: 12px solid #8b5e3c; /* 木枠細く */
+      border-radius: 24px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffe7c6;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .top-ui {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+
+    .pin {
+      width: 24px;
+      height: 24px;
+      background: red;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .stars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .star {
+      width: 20px;
+      height: 20px;
+      background: gold;
+      border-radius: 50%;
+      opacity: 0.2;
+    }
+
+    .star.on {
+      opacity: 1;
+    }
+
+    .menu-button {
+      background: #555;
+      color: white;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid black;
+    }
+
+    .glass-area {
+      flex: 1;
+      background: #b0d0e8;
+      margin: 4px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: #444;
+      opacity: 0.4;
+    }
+
+    .bottom-ui {
+      background: #ffc86f;
+      padding: 8px;
+      border-top: 2px solid #aaa;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .mode-button {
+      padding: 4px 10px;
+      font-weight: bold;
+      border-radius: 8px;
+      border: 2px solid black;
+    }
+
+    .seireki { background: red; color: white; }
+    .wareki  { background: #888; color: white; }
+
+    .era-box {
+      background: #ffeb66;
+      border: 2px solid black;
+      padding: 6px 16px;
+      font-weight: bold;
+      border-radius: 10px;
+    }
+
+    .dial-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .digit-box {
+      width: 24px;
+      height: 60px;
+      background: linear-gradient(to bottom, #d6ba76, #4d3b1f);
+      border-radius: 12px;
+      border: 2px solid black;
+      overflow: hidden;
+      position: relative;
+      user-select: none;
+    }
+
+    .digit-inner {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      line-height: 60px;
+      transition: transform 0.2s ease;
+    }
+
+    .dial-label {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0 4px;
+    }
+
+    .jump-column {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-left: 6px;
+    }
+
+    .jump-button {
+      background: red;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      width: 32px;
+      height: 32px;
+      border: 2px solid black;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .go-button {
+      background: #00aa44;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid black;
+      margin-left: 6px;
+    }
   </style>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script>
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+  <div class="frame">
+    <!-- 上部UI -->
+    <div class="top-ui">
+      <div class="pin"></div>
+      <div class="stars">
+        <div class="star on"></div>
+        <div class="star on"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+      </div>
+      <button class="menu-button">≡</button>
+    </div>
 
-// ライト
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(10, 10, 10);
-scene.add(light);
+    <!-- ガラス面 -->
+    <div class="glass-area">
+      <div class="glass-label">地球儀ビュー（仮）</div>
+    </div>
 
-// 地球テクスチャ
-const loader = new THREE.TextureLoader();
-const colorMap = loader.load("colormap_final.jpg");
-const heightMap = loader.load("heightmap_final.png");
+    <!-- 下部UI -->
+    <div class="bottom-ui">
+      <div class="row">
+        <button class="mode-button seireki">西暦</button>
+        <button class="mode-button wareki">和暦</button>
+        <div class="era-box">江戸時代（慶応）</div>
+      </div>
+      <div class="dial-row">
+        <!-- 年ダイヤル4桁 -->
+        <div class="digit-box"><div class="digit-inner">1</div></div>
+        <div class="digit-box"><div class="digit-inner">8</div></div>
+        <div class="digit-box"><div class="digit-inner">6</div></div>
+        <div class="digit-box"><div class="digit-inner">5</div></div>
+        <div class="dial-label">年</div>
 
-// 地球モデル
-const geometry = new THREE.SphereGeometry(5, 128, 128);
-const material = new THREE.MeshStandardMaterial({
-  map: colorMap,
-  displacementMap: heightMap,
-  displacementScale: 0.36  // ★ 高低差3倍
-});
-const globe = new THREE.Mesh(geometry, material);
-scene.add(globe);
+        <!-- 月日 -->
+        <div class="digit-box"><div class="digit-inner">ー</div></div>
+        <div class="dial-label">月</div>
+        <div class="digit-box"><div class="digit-inner">ー</div></div>
+        <div class="dial-label">日</div>
 
-// カメラ初期位置
-camera.position.z = 15;
-let targetZoom = 15;
-let currentZoom = 15;
+        <!-- ジャンプボタン（横三角を上下に） -->
+        <div class="jump-column">
+          <div class="jump-button">&#9654;</div>
+          <div class="jump-button">&#9654;</div>
+        </div>
 
-// 地球操作
-let isDragging = false;
-let prevMouse = { x: 0, y: 0 };
-renderer.domElement.addEventListener("mousedown", e => { isDragging = e.button === 0; });
-renderer.domElement.addEventListener("mouseup", () => { isDragging = false; });
-renderer.domElement.addEventListener("mousemove", e => {
-  if (isDragging) {
-    const dx = e.offsetX - prevMouse.x;
-    const dy = e.offsetY - prevMouse.y;
-    globe.rotation.y += dx * 0.005;
-    globe.rotation.x += dy * 0.005;
-  }
-  prevMouse = { x: e.offsetX, y: e.offsetY };
-});
-renderer.domElement.addEventListener("wheel", e => {
-  e.preventDefault();
-  targetZoom += e.deltaY * 0.01;
-  targetZoom = Math.max(7, Math.min(30, targetZoom));
-});
+        <!-- GO -->
+        <button class="go-button">GO</button>
+      </div>
+    </div>
+  </div>
 
-// 緯度経度 → 座標
-function latLonToVec3(lat, lon, radius = 5.01) {
-  const phi = (90 - lat) * Math.PI / 180;
-  const theta = (lon + 180) * Math.PI / 180;
-  return new THREE.Vector3(
-    radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
-}
+  <script>
+    const boxes = document.querySelectorAll('.digit-box');
+    boxes.forEach((box, index) => {
+      if (index > 3) return; // 年の4桁だけ
+      let inner = box.querySelector('.digit-inner');
+      let current = parseInt(inner.textContent) || 0;
+      let startY = 0;
 
-// フィギュアの配置定義
-const figures = [
-  { lat: 29.98, lon: 31.13, type: "box" },
-  { lat: 34.84, lon: 134.69, type: "box" },
-  { lat: 35.02, lon: 135.75, type: "cylinder" },
-  { lat: 40.68, lon: 117.23, type: "box" },
-  { lat: 48.85, lon: 2.35, type: "cylinder" },
-  { lat: 23.13, lon: -82.38, type: "cone" },
-  { lat: 27.17, lon: 78.04, type: "box" },
-  { lat: 41.89, lon: 12.49, type: "box" },
-  { lat: 30.33, lon: 35.44, type: "box" },
-  { lat: 43.07, lon: 141.35, type: "cylinder" },
-  { lat: 31.23, lon: 121.47, type: "cylinder" },
-  { lat: 37.98, lon: 23.72, type: "box" },
-  { lat: 52.52, lon: 13.40, type: "cylinder" },
-  { lat: 35.68, lon: 139.69, type: "cylinder" },
-  { lat: 39.90, lon: 116.40, type: "cylinder" },
-  { lat: 25.03, lon: 121.56, type: "cone" },
-  { lat: 33.44, lon: -112.07, type: "cone" },
-  { lat: -22.90, lon: -43.20, type: "cylinder" },
-  { lat: 51.50, lon: -0.12, type: "cylinder" },
-  { lat: -33.87, lon: 151.21, type: "cone" },
-  { lat: -34.61, lon: -58.38, type: "cylinder" },
-  { lat: 60.17, lon: 24.94, type: "cone" },
-  { lat: 50.08, lon: 14.43, type: "cone" },
-  { lat: 41.39, lon: 2.17, type: "cone" },
-  { lat: 30.59, lon: 114.30, type: "cone" }
-];
+      box.addEventListener('mousedown', e => {
+        startY = e.clientY;
+        document.onmousemove = drag;
+        document.onmouseup = stop;
+      });
 
-// 各フィギュアの表示
-figures.forEach((f, i) => {
-  let mesh;
-  const pos = latLonToVec3(f.lat, f.lon);
+      function drag(e) {
+        const delta = e.clientY - startY;
+        if (Math.abs(delta) > 20) {
+          current = (delta > 0) ? (current + 1) % 10 : (current + 9) % 10;
+          const next = document.createElement('div');
+          next.className = 'digit-inner';
+          next.textContent = current;
+          next.style.top = delta > 0 ? '-60px' : '60px';
+          box.appendChild(next);
+          requestAnimationFrame(() => {
+            next.style.transition = 'transform 0.2s ease';
+            next.style.transform = 'translateY(' + (delta > 0 ? '60px' : '-60px') + ')';
+            inner.style.transform = 'translateY(' + (delta > 0 ? '60px' : '-60px') + ')';
+          });
+          setTimeout(() => {
+            inner.remove();
+            next.style.transform = '';
+            next.style.top = '0';
+          }, 200);
+          inner = next;
+          startY = e.clientY;
+        }
+      }
 
-  if (f.type === "box") {
-    const geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffcc00 });
-    mesh = new THREE.Mesh(geo, mat);
-  } else if (f.type === "cylinder") {
-    const geo = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
-    const mat = new THREE.MeshStandardMaterial({ color: 0x00ccff });
-    mesh = new THREE.Mesh(geo, mat);
-  } else {
-    const geo = new THREE.ConeGeometry(0.12, 0.3, 4);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xff6699 });
-    mesh = new THREE.Mesh(geo, mat);
-  }
-
-  mesh.position.copy(pos);
-  mesh.lookAt(new THREE.Vector3(0, 0, 0));
-  globe.add(mesh);
-});
-
-// アニメーション
-function animate() {
-  requestAnimationFrame(animate);
-  currentZoom += (targetZoom - currentZoom) * 0.05;
-  camera.position.z = currentZoom;
-  renderer.render(scene, camera);
-}
-animate();
-
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-</script>
+      function stop() {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      }
+    });
+  </script>
 </body>
 </html>
+
