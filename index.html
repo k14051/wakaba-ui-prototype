@@ -89,12 +89,12 @@
     }
 
     .bottom-ui {
-  background: #ffc86f;
-  padding: 8px;
-  border-top: 2px solid #aaa;
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
-}
+      background: #ffc86f;
+      padding: 8px;
+      border-top: 2px solid #aaa;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
 
     .row {
       display: flex;
@@ -140,37 +140,42 @@
       gap: 6px;
     }
 
-.digit-box {
-  width: 33px;   /* ← もとの24pxから少し太めに */
-  height: 60px;
-/* 月・日のダイヤル幅をベースの2倍に */
-}
-.dial-row .digit-box:nth-child(6),
-.dial-row .digit-box:nth-child(8) {
-  width: 66px;  /* 33px × 2 */
-}
+    /* ───────────── */
+    /* 基本ダイヤル（筒状・上下丸・左右直線） */
+    .digit-box {
+      width: 33px;    /* 基本幅を1.1倍に */
+      height: 60px;
 
-  /* ▼ 横方向のグラデで立体感を軽減し、自然な光沢に */
-  background: linear-gradient(
-    to right,
-    #bbb 0%,    /* 左端：やや暗め */
-    #e0e0e0 40%,/* 中央手前側：明るめ */
-    #f7f7f7 50%,/* ハイライトの頂点 */
-    #e0e0e0 60%,/* 中央向こう側：やや明るめ */
-    #bbb 100%   /* 右端：暗め */
-  );
-  border-radius: 0px / 30px;  /* 上下半円・左右直線 */
+      /* 横方向の自然な筒状グラデーション */
+      background: linear-gradient(
+        to right,
+        #bbb 0%,
+        #e0e0e0 40%,
+        #f7f7f7 50%,
+        #e0e0e0 60%,
+        #bbb 100%
+      );
 
-  /* ▼ 光沢を細く弱いシャドウで表現 */
-  box-shadow:
-    inset 2px 0 4px rgba(255,255,255,0.4),  /* 左内ハイライト */
-    inset -2px 0 4px rgba(0,0,0,0.2);       /* 右内シャドウ */
+      /* 上下半円・左右直線 */
+      border-radius: 0px / 30px;
 
-  border: 1px solid #888;
-  overflow: hidden;
-  position: relative;
-  user-select: none;
-}
+      /* 内側左右に弱いシャドウで立体感 */
+      box-shadow:
+        inset 2px 0 4px rgba(255,255,255,0.4),
+        inset -2px 0 4px rgba(0,0,0,0.2);
+
+      border: 1px solid #888;
+      overflow: hidden;
+      position: relative;
+      user-select: none;
+    }
+
+    /* ───────────── */
+    /* 月・日のダイヤルは2倍幅 */
+    .dial-row > .digit-box:nth-of-type(5),
+    .dial-row > .digit-box:nth-of-type(6) {
+      width: 66px;  /* 33px × 2 */
+    }
 
     .digit-inner {
       position: absolute;
@@ -194,7 +199,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-left: 6px;
+      margin-left: -4px;
     }
 
     .jump-button {
@@ -222,6 +227,7 @@
       border: 2px solid black;
       margin-left: 6px;
     }
+
   </style>
 </head>
 <body>
@@ -264,10 +270,10 @@
         <div class="dial-label">月</div>
         <div class="digit-box"><div class="digit-inner">ー</div></div>
         <div class="dial-label">日</div>
-        <div class="jump-column" style="margin-left: -4px;">
-  <div class="jump-button" style="margin-left: -6px;">&#9664;</div>  <!-- ◀ 過去へ -->
-  <div class="jump-button" style="margin-left: 6px;">&#9654;</div>   <!-- ▶ 未来へ -->
-</div>
+        <div class="jump-column">
+          <div class="jump-button" style="margin-left: -6px;">&#9664;</div>
+          <div class="jump-button" style="margin-left: 6px;">&#9654;</div>
+        </div>
         <button class="go-button">GO</button>
       </div>
     </div>
@@ -361,7 +367,7 @@
         "元禄": "江戸時代", "享保": "江戸時代", "天明": "江戸時代", "安政": "江戸時代", "慶応": "江戸時代",
         "明治": "明治時代", "大正": "大正時代", "昭和": "昭和時代", "平成": "平成時代", "令和": "令和時代"
       };
-      return `${period[era] || ""}（${era}）`;
+      return `${period[era] || ""}（${era}】`;
     }
   </script>
 </body>
