@@ -2,17 +2,19 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>わかば 和暦連動付き木枠UI</title>
+  <title>わかば 和暦連動付きUI 完成版</title>
   <style>
-    /* ─── 全体レイアウト ───────────────── */
+    /* 画面全体の基本設定 */
     html, body {
       margin: 0;
       padding: 0;
-      background: #d6b78e;
+      background: #d6b78e; /* 背景色：茶系 */
       font-family: "Meiryo", sans-serif;
       height: 100vh;
       overflow: hidden;
     }
+
+    /* 外枠（木枠）の設定 */
     .frame {
       width: 360px;
       height: 640px;
@@ -26,7 +28,7 @@
       box-sizing: border-box;
     }
 
-    /* ─── 上部UI ───────────────── */
+    /* 上部UI（押しピン・星・メニュー） */
     .top-ui {
       height: 60px;
       display: flex;
@@ -35,25 +37,37 @@
       padding: 0 12px;
     }
     .pin {
-      width: 24px; height: 24px;
+      width: 24px;
+      height: 24px;
       background: red;
-      border-radius: 50%; border: 2px solid #fff;
+      border-radius: 50%;
+      border: 2px solid #fff;
     }
-    .stars { display: flex; gap: 4px; }
+    .stars {
+      display: flex;
+      gap: 4px;
+    }
     .star {
-      width: 20px; height: 20px;
-      background: gold; border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      background: gold;
+      border-radius: 50%;
       opacity: 0.2;
     }
-    .star.on { opacity: 1; }
+    .star.on {
+      opacity: 1;
+    }
     .menu-button {
-      background: #555; color: white;
-      border-radius: 6px; padding: 4px 8px;
-      font-weight: bold; font-size: 14px;
+      background: #555;
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      border-radius: 6px;
+      font-size: 14px;
       border: 2px solid black;
     }
 
-    /* ─── ガラス面 ───────────────── */
+    /* 中央（ガラス面） */
     .glass-area {
       flex: 1;
       background: #b0d0e8;
@@ -64,12 +78,15 @@
     }
     .glass-label {
       position: absolute;
-      top:50%; left:50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 24px; color: #444; opacity: 0.4;
+      font-size: 24px;
+      color: #444;
+      opacity: 0.4;
     }
 
-    /* ─── 下部UI ───────────────── */
+    /* 下部パネル（年・月・日ダイヤル） */
     .bottom-ui {
       background: #ffc86f;
       padding: 8px;
@@ -85,15 +102,19 @@
       margin-bottom: 8px;
     }
     .mode-button {
-      padding: 4px 10px; font-weight: bold;
-      border-radius: 8px; border: 2px solid black;
+      padding: 4px 10px;
+      font-weight: bold;
+      border-radius: 8px;
+      border: 2px solid black;
     }
     .seireki { background: red; color: white; }
     .wareki  { background: #888; color: white; }
 
+    /* 和暦表示ボックス */
     .era-box {
       position: relative;
-      width: 180px; height: 32px;
+      width: 180px;
+      height: 32px;
       overflow: hidden;
       border: 2px solid black;
       background: #ffeb66;
@@ -103,10 +124,12 @@
     }
     .era-text {
       position: absolute;
-      width: 100%; left: 0;
+      width: 100%;
+      left: 0;
       transition: transform 0.3s ease;
     }
 
+    /* ダイヤル行 */
     .dial-row {
       display: flex;
       align-items: center;
@@ -114,11 +137,10 @@
       gap: 6px;
     }
 
-    /* ─── ダイヤル共通 ───────────────── */
+    /* 各ダイヤルの基本形状 */
     .digit-box {
-      width: 33px;   /* 基本幅 */
+      width: 33px; /* ベース幅（後で個別拡張） */
       height: 60px;
-
       background: linear-gradient(
         to right,
         #bbb 0%,
@@ -127,8 +149,7 @@
         #e0e0e0 60%,
         #bbb 100%
       );
-      /* 左右が半円・上下直線 */
-      border-radius: 30px / 0px;
+      border-radius: 30px / 0px; /* 左右丸み、上下直線 */
       box-shadow:
         inset 2px 0 4px rgba(255,255,255,0.4),
         inset -2px 0 4px rgba(0,0,0,0.2);
@@ -138,179 +159,129 @@
       user-select: none;
     }
 
-    /* 年ダイヤルを1.5倍に */
+    /* 年ダイヤルを1.5倍（50px幅） */
     .dial-row > .digit-box:nth-of-type(1),
     .dial-row > .digit-box:nth-of-type(2),
     .dial-row > .digit-box:nth-of-type(3),
     .dial-row > .digit-box:nth-of-type(4) {
-      width: 50px;  /* 33px×1.5 */
+      width: 50px;
     }
-    /* 月／日ダイヤルを100pxに */
+
+    /* 月・日ダイヤルを100px幅に */
     .dial-row > .digit-box:nth-of-type(5),
     .dial-row > .digit-box:nth-of-type(6) {
       width: 100px;
     }
 
+    /* ダイヤル内の数字スタイル */
     .digit-inner {
       position: absolute;
-      top: 0; width: 100%;
+      top: 0;
+      width: 100%;
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      color: black;   /* 黒文字 */
+      color: black; /* 数字を黒に */
       line-height: 60px;
       transition: transform 0.2s ease;
     }
 
+    /* 年・月・日ラベル */
     .dial-label {
       font-size: 14px;
       font-weight: bold;
       margin: 0 4px;
     }
+
+    /* ジャンプボタン縦並び */
     .jump-column {
-      display: flex; flex-direction: column; gap: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       margin-left: -4px;
     }
     .jump-button {
-      background: red; color: white;
-      font-size: 18px; font-weight: bold;
-      width: 32px; height: 32px;
+      background: red;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      width: 32px;
+      height: 32px;
       border: 2px solid black;
       border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
+    /* GOボタン */
     .go-button {
-      background: #00aa44; color: white;
-      font-weight: bold; font-size: 16px;
-      width: 44px; height: 44px;
+      background: #00aa44;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 2px solid black;
       margin-left: 6px;
     }
   </style>
 </head>
+
 <body>
-  <div class="frame">
-    <!-- 上部UI -->
-    <div class="top-ui">
-      <div class="pin"></div>
-      <div class="stars">
-        <div class="star on"></div>
-        <div class="star on"></div>
-        <div class="star"></div>
-        <div class="star"></div>
-        <div class="star"></div>
+<!-- フレーム全体 -->
+<div class="frame">
+
+  <!-- 上部UI -->
+  <div class="top-ui">
+    <div class="pin"></div>
+    <div class="stars">
+      <div class="star on"></div>
+      <div class="star on"></div>
+      <div class="star"></div>
+      <div class="star"></div>
+      <div class="star"></div>
+    </div>
+    <button class="menu-button">≡</button>
+  </div>
+
+  <!-- ガラス面 -->
+  <div class="glass-area">
+    <div class="glass-label">地球儀ビュー（仮）</div>
+  </div>
+
+  <!-- 下部UI（ダイヤル＋ボタン群） -->
+  <div class="bottom-ui">
+    <div class="row">
+      <button class="mode-button seireki">西暦</button>
+      <button class="mode-button wareki">和暦</button>
+      <div class="era-box">
+        <div id="eraText1" class="era-text">江戸時代（慶応）</div>
+        <div id="eraText2" class="era-text" style="top:32px;"></div>
       </div>
-      <button class="menu-button">≡</button>
     </div>
 
-    <!-- ガラス面 -->
-    <div class="glass-area">
-      <div class="glass-label">地球儀ビュー（仮）</div>
-    </div>
-
-    <!-- 下部UI -->
-    <div class="bottom-ui">
-      <div class="row">
-        <button class="mode-button seireki">西暦</button>
-        <button class="mode-button wareki">和暦</button>
-        <div class="era-box">
-          <div id="eraText1" class="era-text">江戸時代（慶応）</div>
-          <div id="eraText2" class="era-text" style="top:32px;"></div>
-        </div>
+    <div class="dial-row">
+      <div class="digit-box"><div class="digit-inner">1</div></div>
+      <div class="digit-box"><div class="digit-inner">8</div></div>
+      <div class="digit-box"><div class="digit-inner">6</div></div>
+      <div class="digit-box"><div class="digit-inner">5</div></div>
+      <div class="dial-label">年</div>
+      <div class="digit-box"><div class="digit-inner">ー</div></div>
+      <div class="dial-label">月</div>
+      <div class="digit-box"><div class="digit-inner">ー</div></div>
+      <div class="dial-label">日</div>
+      <div class="jump-column">
+        <div class="jump-button" style="margin-left:-6px;">&#9664;</div>
+        <div class="jump-button" style="margin-left:6px;">&#9654;</div>
       </div>
-      <div class="dial-row">
-        <div class="digit-box"><div class="digit-inner">1</div></div>
-        <div class="digit-box"><div class="digit-inner">8</div></div>
-        <div class="digit-box"><div class="digit-inner">6</div></div>
-        <div class="digit-box"><div class="digit-inner">5</div></div>
-        <div class="dial-label">年</div>
-        <div class="digit-box"><div class="digit-inner">ー</div></div>
-        <div class="dial-label">月</div>
-        <div class="digit-box"><div class="digit-inner">ー</div></div>
-        <div class="dial-label">日</div>
-        <div class="jump-column">
-          <div class="jump-button" style="margin-left:-6px;">&#9664;</div>
-          <div class="jump-button" style="margin-left:6px;">&#9654;</div>
-        </div>
-        <button class="go-button">GO</button>
-      </div>
+      <button class="go-button">GO</button>
     </div>
   </div>
 
-  <script>
-    const warekiTable = [
-      { start: 701, label: "大宝" }, { start: 708, label: "和銅" },
-      /* ... */ { start: 1989, label: "平成" }, { start: 2019, label: "令和" }
-    ];
+</div>
 
-    let currentEra = "江戸時代（慶応）";
-    const boxes = document.querySelectorAll('.digit-box');
-
-    boxes.forEach((box, i) => {
-      if (i > 3) return;  // 年4桁のみ
-      let inner = box.querySelector('.digit-inner');
-      let current = parseInt(inner.textContent) || 0;
-      let startY = 0;
-
-      box.addEventListener('mousedown', e => {
-        startY = e.clientY;
-        document.onmousemove = drag;
-        document.onmouseup = stop;
-      });
-
-      function drag(e) {
-        const delta = e.clientY - startY;
-        if (Math.abs(delta) > 20) {
-          box.querySelectorAll('.digit-inner').forEach(el => el.remove());
-          current = delta>0 ? (current+1)%10 : (current+9)%10;
-          const next = document.createElement('div');
-          next.className = 'digit-inner';
-          next.textContent = current;
-          next.style.top = '0';
-          box.appendChild(next);
-          inner = next;
-          startY = e.clientY;
-          checkEraChange();
-        }
-      }
-      function stop() {
-        document.onmousemove = null;
-        document.onmouseup = null;
-      }
-    });
-
-    function checkEraChange(){
-      const year = parseInt([...boxes].slice(0,4).map(b=>b.textContent).join(''));
-      const era = warekiTable.find((e,i)=> {
-        const nxt = warekiTable[i+1];
-        return year>=e.start && (!nxt||year<nxt.start);
-      });
-      if(!era) return;
-      const label = `${getEraLabel(era.label)}`;
-      if(label!==currentEra){
-        const t1 = document.getElementById("eraText1");
-        const t2 = document.getElementById("eraText2");
-        t2.textContent = label;
-        t1.style.transform="translateY(-32px)";
-        t2.style.transform="translateY(-32px)";
-        setTimeout(()=>{
-          t1.textContent=label;
-          t1.style.transform="translateY(0)";
-          t2.style.transform="translateY(32px)";
-          currentEra=label;
-        },300);
-      }
-    }
-
-    function getEraLabel(era){
-      const period = {
-        "大宝":"奈良時代", /* ... */ "平成":"平成時代","令和":"令和時代"
-      };
-      return `${period[era]||""}（${era}）`;
-    }
-  </script>
+<!-- ここまで -->
 </body>
 </html>
