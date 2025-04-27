@@ -2,19 +2,17 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>わかば 和暦連動付きUI 完成版</title>
+  <title>わかば 和暦連動付きUI 修正版</title>
   <style>
-    /* 画面全体の基本設定 */
+    /* 全体設定 */
     html, body {
       margin: 0;
       padding: 0;
-      background: #d6b78e; /* 背景色：茶系 */
+      background: #d6b78e;
       font-family: "Meiryo", sans-serif;
       height: 100vh;
       overflow: hidden;
     }
-
-    /* 外枠（木枠）の設定 */
     .frame {
       width: 360px;
       height: 640px;
@@ -28,7 +26,7 @@
       box-sizing: border-box;
     }
 
-    /* 上部UI（押しピン・星・メニュー） */
+    /* 上部UI */
     .top-ui {
       height: 60px;
       display: flex;
@@ -67,7 +65,7 @@
       border: 2px solid black;
     }
 
-    /* 中央（ガラス面） */
+    /* ガラス面 */
     .glass-area {
       flex: 1;
       background: #b0d0e8;
@@ -86,7 +84,7 @@
       opacity: 0.4;
     }
 
-    /* 下部パネル（年・月・日ダイヤル） */
+    /* 下部UI */
     .bottom-ui {
       background: #ffc86f;
       padding: 8px;
@@ -110,7 +108,6 @@
     .seireki { background: red; color: white; }
     .wareki  { background: #888; color: white; }
 
-    /* 和暦表示ボックス */
     .era-box {
       position: relative;
       width: 180px;
@@ -129,7 +126,7 @@
       transition: transform 0.3s ease;
     }
 
-    /* ダイヤル行 */
+    /* ダイヤルの並び */
     .dial-row {
       display: flex;
       align-items: center;
@@ -137,9 +134,9 @@
       gap: 6px;
     }
 
-    /* 各ダイヤルの基本形状 */
+    /* 基本のダイヤル見た目 */
     .digit-box {
-      width: 33px; /* ベース幅（後で個別拡張） */
+      width: 33px; /* 初期幅。後で個別指定あり */
       height: 60px;
       background: linear-gradient(
         to right,
@@ -149,7 +146,7 @@
         #e0e0e0 60%,
         #bbb 100%
       );
-      border-radius: 30px / 0px; /* 左右丸み、上下直線 */
+      border-radius: 30px / 0px; /* 左右丸く、上下直角 */
       box-shadow:
         inset 2px 0 4px rgba(255,255,255,0.4),
         inset -2px 0 4px rgba(0,0,0,0.2);
@@ -159,21 +156,17 @@
       user-select: none;
     }
 
-    /* 年ダイヤルを1.5倍（50px幅） */
-    .dial-row > .digit-box:nth-of-type(1),
-    .dial-row > .digit-box:nth-of-type(2),
-    .dial-row > .digit-box:nth-of-type(3),
-    .dial-row > .digit-box:nth-of-type(4) {
+    /* 年ダイヤルだけ1.5倍に */
+    .year-box {
       width: 50px;
     }
 
-    /* 月・日ダイヤルを100px幅に */
-    .dial-row > .digit-box:nth-of-type(5),
-    .dial-row > .digit-box:nth-of-type(6) {
+    /* 月・日ダイヤルだけ100pxに */
+    .month-box, .day-box {
       width: 100px;
     }
 
-    /* ダイヤル内の数字スタイル */
+    /* ダイヤル内部の数字 */
     .digit-inner {
       position: absolute;
       top: 0;
@@ -181,7 +174,7 @@
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      color: black; /* 数字を黒に */
+      color: black; /* 数字は黒に */
       line-height: 60px;
       transition: transform 0.2s ease;
     }
@@ -228,12 +221,11 @@
     }
   </style>
 </head>
-
 <body>
-<!-- フレーム全体 -->
+
 <div class="frame">
 
-  <!-- 上部UI -->
+  <!-- 上部 -->
   <div class="top-ui">
     <div class="pin"></div>
     <div class="stars">
@@ -251,7 +243,7 @@
     <div class="glass-label">地球儀ビュー（仮）</div>
   </div>
 
-  <!-- 下部UI（ダイヤル＋ボタン群） -->
+  <!-- 下部 -->
   <div class="bottom-ui">
     <div class="row">
       <button class="mode-button seireki">西暦</button>
@@ -263,25 +255,33 @@
     </div>
 
     <div class="dial-row">
-      <div class="digit-box"><div class="digit-inner">1</div></div>
-      <div class="digit-box"><div class="digit-inner">8</div></div>
-      <div class="digit-box"><div class="digit-inner">6</div></div>
-      <div class="digit-box"><div class="digit-inner">5</div></div>
+      <!-- 年ダイヤル（4桁） -->
+      <div class="digit-box year-box"><div class="digit-inner">1</div></div>
+      <div class="digit-box year-box"><div class="digit-inner">8</div></div>
+      <div class="digit-box year-box"><div class="digit-inner">6</div></div>
+      <div class="digit-box year-box"><div class="digit-inner">5</div></div>
+
       <div class="dial-label">年</div>
-      <div class="digit-box"><div class="digit-inner">ー</div></div>
+
+      <!-- 月ダイヤル -->
+      <div class="digit-box month-box"><div class="digit-inner">ー</div></div>
       <div class="dial-label">月</div>
-      <div class="digit-box"><div class="digit-inner">ー</div></div>
+
+      <!-- 日ダイヤル -->
+      <div class="digit-box day-box"><div class="digit-inner">ー</div></div>
       <div class="dial-label">日</div>
+
+      <!-- ジャンプボタンとGOボタン -->
       <div class="jump-column">
         <div class="jump-button" style="margin-left:-6px;">&#9664;</div>
         <div class="jump-button" style="margin-left:6px;">&#9654;</div>
       </div>
       <button class="go-button">GO</button>
     </div>
+
   </div>
 
 </div>
 
-<!-- ここまで -->
 </body>
 </html>
